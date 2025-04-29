@@ -14,10 +14,11 @@ struct Cli {
     /// Input compressed file
     compressed: PathBuf,
 
-    /// Sets a custom config file
+    /// Skip this many bytes
     #[arg(short, long, default_value_t = 0)]
     skip: usize,
 
+    /// Write to this file
     #[arg(short, long)]
     output: PathBuf,
 }
@@ -39,7 +40,7 @@ fn main() {
     reader
         .read_exact(&mut compressed_buf)
         .expect("Compressed source should always contain bytes indicated by compressed size");
-    let mut decompressed_buf = vec![0; compressed_size as usize];
+    let mut decompressed_buf = vec![0; decompressed_size as usize];
     fastlz::decompress(&compressed_buf, &mut decompressed_buf)
         .expect("Decompressing should never fail on compressed data");
     BufWriter::new(File::create(cli.output).expect("Should be able to create output file"))

@@ -14,6 +14,10 @@ struct Cli {
     /// Input compressed file
     compressed: PathBuf,
 
+    /// If this is disabled then don't output header info
+    #[arg(long, default_value_t = true, action = clap::ArgAction::SetFalse)]
+    header: bool,
+
     /// If this is enabled then compress instead
     #[arg(short, long, default_value_t = false)]
     compress: bool,
@@ -57,7 +61,9 @@ fn main() {
         .read_exact(&mut input_buf)
         .expect("Input should always contain bytes indicated by input size");
 
-    println!("input size: {input_size}, output size: {output_size}");
+    if cli.header {
+        println!("input size: {input_size}, output size: {output_size}");
+    }
     if cli.compress {
         let wrote_size = fastlz::compress(&input_buf, &mut output_buf[8..])
             .expect("Decompressing should never fail on compressed data")
